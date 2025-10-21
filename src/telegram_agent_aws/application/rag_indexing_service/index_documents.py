@@ -18,16 +18,32 @@ def generate_split_documents():
     return all_splits
 
 
+# def index_documents():
+#     all_splits = generate_split_documents()
+#     embeddings = OpenAIEmbeddings(model=settings.EMBEDDING_MODEL, api_key=settings.OPENAI_API_KEY)
+#
+#     ### Need to adapt the collection name to the one
+#     vector_store = QdrantVectorStore(
+#         client=get_qdrant_client(),
+#         collection_name="telegram_agent_aws_collection",
+#         embedding=embeddings,
+#     )
+#
+#     vector_store.add_documents(all_splits)
+#
+#     logger.info("Documents indexed successfully.")
+
+
 def index_documents():
     all_splits = generate_split_documents()
     embeddings = OpenAIEmbeddings(model=settings.EMBEDDING_MODEL, api_key=settings.OPENAI_API_KEY)
 
-    vector_store = QdrantVectorStore(
-        client=get_qdrant_client(),
-        collection_name="telegram_agent_aws_collection",
+    QdrantVectorStore.from_documents(
+        documents=all_splits,
         embedding=embeddings,
+        url=settings.QDRANT_URL,
+        api_key=settings.QDRANT_API_KEY,
+        collection_name="telegram_agent_aws_collection",
     )
-
-    vector_store.add_documents(all_splits)
 
     logger.info("Documents indexed successfully.")
